@@ -202,6 +202,16 @@
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.06);
       line-height: 1.55;
+      display: grid;
+      gap: 8px;
+    }
+
+    .story-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
     .tag {
@@ -366,6 +376,23 @@
       stories: JSON.parse(localStorage.getItem('stories') || '[]'),
     };
 
+    const formatDate = (date = new Date()) =>
+      date.toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' });
+
+    function normalizeStories(stories) {
+      return stories.map((story) => {
+        if (typeof story === 'string') {
+          return { text: story, person: 'Bir okuyucu', focus: 'Deneyim', time: formatDate() };
+        }
+        return {
+          text: story.text,
+          person: story.person || 'Bir okuyucu',
+          focus: story.focus || 'Deneyim',
+          time: story.time || formatDate(),
+        };
+      });
+    }
+
     function updateCounter() {
       const remaining = Math.max(0, initialState.total - initialState.progress);
       counterEl.textContent = formatter.format(remaining);
@@ -380,9 +407,12 @@
         return;
       }
       storiesEl.innerHTML = initialState.stories
-        .map((story, idx) => `
+        .map((story) => `
           <article class="story">
-            <div class="pill-info">#${idx + 1} | ${story.time}</div>
+            <div class="story-header">
+              <div class="pill-info">${story.focus || 'Deneyim'}</div>
+              <span class="muted">${story.person} · ${story.time}</span>
+            </div>
             <p>${story.text}</p>
           </article>
         `)
@@ -430,18 +460,39 @@
     });
 
     const demoStories = [
-      '40.000 İhlas tamamladığımda uzun zamandır beklediğim iş teklifi geldi. Şükürler olsun.',
-      'Her gün düzenli okumak kalbimi sakinleştirdi, ailemle ilişkilerim güçlendi.',
-      'Sabah hatırlatmaları sayesinde hedefime sadık kaldım ve 40.000’e ulaştım.',
+      {
+        text: '40.000 İhlas tamamladığım gün uzun zamandır beklediğim iş teklifi geldi; sabrın ve duanın karşılığını gördüm.',
+        person: 'Meryem, İstanbul',
+        focus: 'İş ve bereket',
+        time: formatDate(new Date(Date.now() - 1000 * 60 * 60 * 24 * 12)),
+      },
+      {
+        text: 'Geceleri okumak içimi rahatlattı; kalp çarpıntılarım azaldı, uykularım düzene girdi.',
+        person: 'Hasan, Bursa',
+        focus: 'Şifa',
+        time: formatDate(new Date(Date.now() - 1000 * 60 * 60 * 24 * 30)),
+      },
+      {
+        text: 'Ailece aynı hedefe tutunmak bizi yakınlaştırdı; çocuklarım bile sayacı takip etmeye başladı.',
+        person: 'Elif, Ankara',
+        focus: 'Aile huzuru',
+        time: formatDate(new Date(Date.now() - 1000 * 60 * 60 * 24 * 45)),
+      },
+      {
+        text: 'Sabah bildirimleri sayesinde pes etmedim; 40.000’e ulaştığımda içimde büyük bir ferahlık hissettim.',
+        person: 'Yusuf, Konya',
+        focus: 'Süreklilik',
+        time: formatDate(new Date(Date.now() - 1000 * 60 * 60 * 24 * 60)),
+      },
     ];
 
     if (!initialState.stories.length) {
-      initialState.stories = demoStories.map((text) => ({
-        text,
-        time: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }),
-      }));
+      initialState.stories = demoStories;
       localStorage.setItem('stories', JSON.stringify(initialState.stories));
     }
+
+    initialState.stories = normalizeStories(initialState.stories);
+    localStorage.setItem('stories', JSON.stringify(initialState.stories));
 
     renderStories();
 
@@ -467,7 +518,9 @@
       if (!text) return;
       const entry = {
         text,
-        time: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }),
+        person: 'Yeni okuyucu',
+        focus: 'Kişisel deneyim',
+        time: formatDate(),
       };
       initialState.stories = [entry, ...initialState.stories];
       localStorage.setItem('stories', JSON.stringify(initialState.stories));

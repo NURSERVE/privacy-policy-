@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>40.000 İhlas Sayaç</title>
+  <style>
+    :root {
+      --night-blue: #0b1c3a;
+      --card: #10254a;
+      --accent: #3db5ff;
+      --muted: #c6d3e8;
+      --success: #5ee3a1;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 20% 20%, rgba(61, 181, 255, 0.08), transparent 40%),
+        radial-gradient(circle at 80% 0%, rgba(94, 227, 161, 0.08), transparent 35%),
+        var(--night-blue);
+      color: #f7fbff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .app {
+      width: min(1100px, 100%);
+      background: rgba(16, 37, 74, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 30px 120px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(12px);
+    }
+
+    header {
+      padding: 28px 32px 12px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(11, 28, 58, 0.8);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: 0.4px;
+    }
+
+    .pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(61, 181, 255, 0.2);
+      color: var(--accent);
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      border: 1px solid rgba(61, 181, 255, 0.35);
+    }
+
+    main {
+      padding: 24px 32px 32px;
+      display: grid;
+      gap: 24px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 18px;
+      padding: 18px 18px 20px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+      letter-spacing: 0.2px;
+    }
+
+    .intro {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 18px;
+      padding: 32px 24px 26px;
+      background: linear-gradient(120deg, rgba(61, 181, 255, 0.16), rgba(11, 28, 58, 0.2));
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+    }
+
+    .intro small {
+      color: var(--muted);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    .intro .bismillah {
+      font-size: clamp(32px, 6vw, 52px);
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .primary-btn, .ghost-btn {
+      border: none;
+      cursor: pointer;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      transition: transform 120ms ease, box-shadow 160ms ease, background 180ms ease;
+      color: #06142c;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, #3db5ff, #5ee3a1);
+      box-shadow: 0 10px 30px rgba(61, 181, 255, 0.35);
+    }
+
+    .ghost-btn {
+      background: rgba(255, 255, 255, 0.08);
+      color: #e7f2ff;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .primary-btn:hover, .ghost-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .counter-value {
+      font-size: clamp(42px, 6vw, 64px);
+      margin: 6px 0 8px;
+      font-weight: 800;
+    }
+
+    .counter-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .verse {
+      display: grid;
+      gap: 10px;
+      line-height: 1.5;
+      color: #eaf1ff;
+    }
+
+    .verse .arabic {
+      font-size: 20px;
+      font-weight: 600;
+      text-align: right;
+      letter-spacing: 0.5px;
+    }
+
+    .verse .transliteration {
+      font-style: italic;
+      color: var(--muted);
+    }
+
+    .notifications {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .notification-item {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stories {
+      display: grid;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .story {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      line-height: 1.55;
+      display: grid;
+      gap: 8px;
+    }
+
+    .story-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(94, 227, 161, 0.15);
+      color: var(--success);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 90px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      color: #f7fbff;
+      resize: vertical;
+      font-family: inherit;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .pill-info {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      color: #d8e7ff;
+      font-size: 13px;
+    }
+
+    @media (max-width: 640px) {
+      header, main { padding: 18px; }
+      .card { padding: 14px; }
+      .counter-actions { flex-direction: column; }
+      .notification-item { gap: 12px; flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="pill">Gece Mavisi</div>
+      <h1>40.000 İhlas Sayaç</h1>
+    </header>
+    <main>
+      <section class="intro card" id="intro">
+        <small>Başlangıç</small>
+        <div class="bismillah">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ</div>
+        <p class="muted">Gece mavisi sakinliğinde, ihlas okuyarak yolculuğa başlamak için dokunun.</p>
+        <button class="primary-btn" id="start-btn">Bismillah, başlayalım</button>
+      </section>
+
+      <div class="layout" id="main-panels" hidden>
+        <section class="card">
+          <h2>Sayaç</h2>
+          <p class="muted">Hedef: 40.000 tekrar</p>
+          <div class="counter-value" id="counter">40.000</div>
+          <div class="counter-actions">
+            <button class="primary-btn" id="increment">+1</button>
+            <button class="ghost-btn" id="decrement">-1</button>
+            <button class="ghost-btn" id="reset">Sıfırla</button>
+            <div class="pill-info">Günlük hedef: <span id="daily-target">250</span></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>İhlas Suresi</h2>
+          <div class="verse">
+            <div class="arabic">قُلْ هُوَ اللَّهُ أَحَدٌ  ۝  اللَّهُ الصَّمَدُ  ۝  لَمْ يَلِدْ وَلَمْ يُولَدْ  ۝  وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ</div>
+            <div class="transliteration">Kul hüvallâhu ehad, allâhu’s-samed. Lem yelid ve lem yûled. Ve lem yekun lehû kufuven ehad.</div>
+            <p class="muted">Türkçe anlamı: De ki: O Allah bir tektir. Allah Samed’dir (her şey O’na muhtaç, O hiçbir şeye muhtaç değildir). Doğmamış ve doğurulmamıştır. Hiçbir şey O’na denk değildir.</p>
+          </div>
+        </section>
+      </div>
+
+      <div class="layout" id="secondary-panels" hidden>
+        <section class="card">
+          <h2>Günlük Hedef & Bildirimler</h2>
+          <p class="muted">Günde üç hatırlatma: sabah, öğle, akşam.</p>
+          <div class="notifications">
+            <div class="notification-item">
+              <div><strong>Sabah</strong><br><span class="muted">Günaydın! Güne İhlas okuyarak başlamak ister misin?</span></div>
+              <button class="ghost-btn" data-message="Günaydın! Güne İhlas okuyarak başlamak ister misin?">Gönder</button>
+            </div>
+            <div class="notification-item">
+              <div><strong>Öğle</strong><br><span class="muted">Öğle hatırlatması: Birkaç dakikanı ayırıp İhlas okuyabilirsin.</span></div>
+              <button class="ghost-btn" data-message="Öğle hatırlatması: Birkaç dakikanı ayırıp İhlas okuyabilirsin.">Gönder</button>
+            </div>
+            <div class="notification-item">
+              <div><strong>Akşam</strong><br><span class="muted">Akşam serinliğinde hedefini tamamlamaya ne dersin?</span></div>
+              <button class="ghost-btn" data-message="Akşam serinliğinde hedefini tamamlamaya ne dersin?">Gönder</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="input-row" style="justify-content: space-between; align-items: flex-start;">
+            <div>
+              <h2>Mucize Duvarı</h2>
+              <p class="muted">40.000 İhlas bitirenlerin paylaştığı ilham veren hikâyeler.</p>
+            </div>
+            <span class="tag">Reklam izleyerek yorum yap</span>
+          </div>
+          <div class="stories" id="stories"></div>
+          <div class="card" style="margin-top:12px; background: rgba(0,0,0,0.15);">
+            <div class="input-row">
+              <button class="ghost-btn" id="watch-ad">Reklam İzle</button>
+              <span class="muted" id="ad-status">Yorum yazmak için önce kısa bir reklam izleyin.</span>
+            </div>
+            <textarea id="comment" placeholder="Hikayeni yaz..." disabled></textarea>
+            <div class="input-row" style="justify-content: flex-end;">
+              <button class="primary-btn" id="submit" disabled>Paylaş</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const startBtn = document.querySelector('#start-btn');
+    const intro = document.querySelector('#intro');
+    const mainPanels = document.querySelector('#main-panels');
+    const secondaryPanels = document.querySelector('#secondary-panels');
+    const counterEl = document.querySelector('#counter');
+    const dailyTargetEl = document.querySelector('#daily-target');
+    const incrementBtn = document.querySelector('#increment');
+    const decrementBtn = document.querySelector('#decrement');
+    const resetBtn = document.querySelector('#reset');
+    const notificationButtons = document.querySelectorAll('.notification-item button');
+    const storiesEl = document.querySelector('#stories');
+    const watchAdBtn = document.querySelector('#watch-ad');
+    const adStatus = document.querySelector('#ad-status');
+    const commentBox = document.querySelector('#comment');
+    const submitBtn = document.querySelector('#submit');
+
+    const formatter = new Intl.NumberFormat('tr-TR');
+
+    const initialState = {
+      total: 40000,
+      progress: parseInt(localStorage.getItem('progress') || '0', 10),
+      dailyTarget: parseInt(localStorage.getItem('dailyTarget') || '250', 10),
+      stories: JSON.parse(localStorage.getItem('stories') || '[]'),
+    };
+
+    const formatDate = (date = new Date()) =>
+      date.toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' });
+
+    function normalizeStories(stories) {
+      return stories.map((story) => {
+        if (typeof story === 'string') {
+          return { text: story, person: 'Bir okuyucu', focus: 'Deneyim', time: formatDate() };
+        }
+        return {
+          text: story.text,
+          person: story.person || 'Bir okuyucu',
+          focus: story.focus || 'Deneyim',
+          time: story.time || formatDate(),
+        };
+      });
+    }
+
+    function updateCounter() {
+      const remaining = Math.max(0, initialState.total - initialState.progress);
+      counterEl.textContent = formatter.format(remaining);
+      dailyTargetEl.textContent = formatter.format(initialState.dailyTarget);
+      localStorage.setItem('progress', String(initialState.progress));
+      localStorage.setItem('dailyTarget', String(initialState.dailyTarget));
+    }
+
+    function renderStories() {
+      if (!initialState.stories.length) {
+        storiesEl.innerHTML = '<p class="muted">Henüz paylaşım yok. İlk mucize hikayesini sen ekle!</p>';
+        return;
+      }
+      storiesEl.innerHTML = initialState.stories
+        .map((story) => `
+          <article class="story">
+            <div class="story-header">
+              <div class="pill-info">${story.focus || 'Deneyim'}</div>
+              <span class="muted">${story.person} · ${story.time}</span>
+            </div>
+            <p>${story.text}</p>
+          </article>
+        `)
+        .join('');
+    }
+
+    startBtn.addEventListener('click', () => {
+      intro.hidden = true;
+      mainPanels.hidden = false;
+      secondaryPanels.hidden = false;
+    });
+
+    incrementBtn.addEventListener('click', () => {
+      initialState.progress = Math.min(initialState.total, initialState.progress + 1);
+      updateCounter();
+    });
+
+    decrementBtn.addEventListener('click', () => {
+      initialState.progress = Math.max(0, initialState.progress - 1);
+      updateCounter();
+    });
+
+    resetBtn.addEventListener('click', () => {
+      initialState.progress = 0;
+      updateCounter();
+    });
+
+    notificationButtons.forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const message = btn.dataset.message;
+        if (!('Notification' in window)) {
+          alert('Tarayıcınız bildirimleri desteklemiyor.');
+          return;
+        }
+        let permission = Notification.permission;
+        if (permission === 'default') {
+          permission = await Notification.requestPermission();
+        }
+        if (permission === 'granted') {
+          new Notification('İhlas Hatırlatma', { body: message, icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffffff"><circle cx="12" cy="12" r="10" fill="%230b1c3a"/><path d="M7 13l3 3 7-7" stroke="%235ee3a1" stroke-width="2" fill="none"/></svg>' });
+        } else {
+          alert(message);
+        }
+      });
+    });
+
+    const demoStories = [
+      {
+        text: '40.000 İhlas tamamladığım gün uzun zamandır beklediğim iş teklifi geldi; sabrın ve duanın karşılığını gördüm.',
+        person: 'Meryem, İstanbul',
+        focus: 'İş ve bereket',
+        time: formatDate(new Date(Date.now() - 1000 * 60 * 60 * 24 * 12)),
+      },
+      {
+        text: 'Geceleri okumak içimi rahatlattı; kalp çarpıntılarım azaldı, uykularım düzene girdi.',
+        person: 'Hasan, Bursa',
+        focus: 'Şifa',
+        time: formatDate(new Date(Date.now() - 1000 * 60 * 60 * 24 * 30)),
+      },
+      {
+        text: 'Ailece aynı hedefe tutunmak bizi yakınlaştırdı; çocuklarım bile sayacı takip etmeye başladı.',
+        person: 'Elif, Ankara',
+        focus: 'Aile huzuru',
+        time: formatDate(new Date(Date.now() - 1000 * 60 * 60 * 24 * 45)),
+      },
+      {
+        text: 'Sabah bildirimleri sayesinde pes etmedim; 40.000’e ulaştığımda içimde büyük bir ferahlık hissettim.',
+        person: 'Yusuf, Konya',
+        focus: 'Süreklilik',
+        time: formatDate(new Date(Date.now() - 1000 * 60 * 60 * 24 * 60)),
+      },
+    ];
+
+    if (!initialState.stories.length) {
+      initialState.stories = demoStories;
+      localStorage.setItem('stories', JSON.stringify(initialState.stories));
+    }
+
+    initialState.stories = normalizeStories(initialState.stories);
+    localStorage.setItem('stories', JSON.stringify(initialState.stories));
+
+    renderStories();
+
+    let adUnlocked = false;
+    watchAdBtn.addEventListener('click', () => {
+      watchAdBtn.disabled = true;
+      adStatus.textContent = 'Reklam oynatılıyor... 5 saniye içinde açılacak.';
+      setTimeout(() => {
+        adUnlocked = true;
+        commentBox.disabled = false;
+        submitBtn.disabled = false;
+        adStatus.textContent = 'Reklam tamamlandı. Şimdi yorum yazabilirsiniz.';
+        watchAdBtn.disabled = false;
+      }, 5000);
+    });
+
+    submitBtn.addEventListener('click', () => {
+      if (!adUnlocked) {
+        alert('Yorum yazmak için önce reklam izleyin.');
+        return;
+      }
+      const text = commentBox.value.trim();
+      if (!text) return;
+      const entry = {
+        text,
+        person: 'Yeni okuyucu',
+        focus: 'Kişisel deneyim',
+        time: formatDate(),
+      };
+      initialState.stories = [entry, ...initialState.stories];
+      localStorage.setItem('stories', JSON.stringify(initialState.stories));
+      commentBox.value = '';
+      adUnlocked = false;
+      commentBox.disabled = true;
+      submitBtn.disabled = true;
+      adStatus.textContent = 'Yeni yorum için yeniden reklam izleyin.';
+      renderStories();
+    });
+
+    updateCounter();
+  </script>
+</body>
+</html>
